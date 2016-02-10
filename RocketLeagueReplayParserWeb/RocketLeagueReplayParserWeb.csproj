@@ -39,7 +39,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DeepEqual, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DeepEqual.1.4.0.0\lib\net40\DeepEqual.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="RocketLeagueReplayParser, Version=1.0.5883.36908, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RocketLeagueReplayParser.1.0.5883.36908\lib\net45\RocketLeagueReplayParser.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -106,12 +114,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RocketLeagueReplayParser\RocketLeagueReplayParser.csproj">
-      <Project>{1f9bc79a-fc7c-4510-9106-bb55c2e8ed20}</Project>
-      <Name>RocketLeagueReplayParser</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

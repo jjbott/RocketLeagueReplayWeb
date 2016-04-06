@@ -57,12 +57,14 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		// lights
 
 		light = new THREE.DirectionalLight(0xffffff);
+		light.position.set(0, 0, 5000);
 		light.castShadow = true;
 		light.shadow.camera.left = -5000;
 		light.shadow.camera.right = 5000;
 		light.shadow.camera.top = 5000;
 		light.shadow.camera.bottom = -5000;
-		light.position.set(0, 0, 5000);
+		light.shadow.camera.near = 2000;
+		light.shadow.camera.far = 6000;
 		scene.add(light);
 
 		light = new THREE.DirectionalLight(0x002288);

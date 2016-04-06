@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		renderer.setClearColor(0xcccccc);
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.shadowMapEnabled = true;
+		renderer.shadowMap.enabled = true;
 
 		var container = document.getElementById('container');
 		container.appendChild(renderer.domElement);
@@ -58,10 +58,10 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 		light = new THREE.DirectionalLight(0xffffff);
 		light.castShadow = true;
-		light.shadowCameraLeft = -5000;
-		light.shadowCameraRight = 5000;
-		light.shadowCameraTop = 5000;
-		light.shadowCameraBottom = -5000;
+		light.shadow.camera.left = -5000;
+		light.shadow.camera.right = 5000;
+		light.shadow.camera.top = 5000;
+		light.shadow.camera.bottom = -5000;
 		light.position.set(0, 0, 5000);
 		scene.add(light);
 

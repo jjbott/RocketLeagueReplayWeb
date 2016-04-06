@@ -137,16 +137,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
 				actors[a.Id].addUpdate(f.Time, a);
 			}
 		}
-		
-		// rebuild scene from scratch?
-		// Or are actors handling scene updates for us?
-		// Hm.. Maybe like this....
-		//var scene; //= new scene or whatever
-		//for(var a in actors) {
-		//	a.render(time, scene);
-		//}
-		// With this, we may end up recreating a scene and throwing it away if this frame isnt the one that'll be displayed.
-		// There are so few objects that that might be okay though.
 	}
 	
 	function Actor() {

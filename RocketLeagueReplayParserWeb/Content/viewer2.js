@@ -43,54 +43,17 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 		var loader = new THREE.JSONLoader(); // init the loader util
 
-		// init loading
-		//loader.load('/Content/Stadiums/default.json', function (geometry) {
-		ajaxProgress({
-			url : '/Content/Stadiums/default.json',
-			//dataType: 'text',
-			success : function (data) {
-				var model = loader.parse(data);
-				// create a new material
-				var material = new THREE.MeshPhongMaterial({
-						color : 0xaaffaa,
-						shading : THREE.FlatShading
-					});
-
-				// create a mesh with models geometry and material
-				var mesh = new THREE.Mesh(
-						model.geometry,
-						material);
-
-				mesh.castShadow = false;
-				mesh.receiveShadow = true;
-
-				scene.add(mesh);
-			},
-			progress : function (current, total) {
-				console.log(current, total);
-			}
+		loader.load('/Content/Stadiums/default.json', function (geometry) {
+			var material = new THREE.MeshPhongMaterial({
+				color : 0xaaffaa,
+				shading : THREE.FlatShading
+			});
+			var mesh = new THREE.Mesh(geometry, material);
+			mesh.castShadow = false;
+			mesh.receiveShadow = true;
+			scene.add(mesh);
 		});
-		/*
-		[-4077, 4077].forEach(function(x) {
-		[-5976, 5977].forEach(function(y) {
-		[14, 2027].forEach(function(z) {
-
-		var geometry = new THREE.SphereGeometry(100, 32, 32);
-		var material = new THREE.MeshPhongMaterial({
-		color: 0xff0000,
-		shading: THREE.FlatShading
-		});
-
-		mesh = new THREE.Mesh(geometry, material);
-		mesh.matrixAutoUpdate = true;
-		mesh.position.set(x, y, z);
-
-		scene.add(mesh);
-		});
-		});
-		});
-		 */
-
+		
 		// lights
 
 		light = new THREE.DirectionalLight(0xffffff);
@@ -113,19 +76,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		light = new THREE.AmbientLight(0x222222);
 		scene.add(light);
 
-		//
-		//$.getJSON("/data/replays/817A479A475AF16E2D1E8E8138452FBA.replay.json", function(data) {
 		// TODO: all json loaders need to be promisized. No guarantee this will finish last!
-		ajaxProgress({
-			url : "/data/replays/817A479A475AF16E2D1E8E8138452FBA.replay.json",
-			success : function (data) {
-				initializeAnimation(data);
-				$('.ui').show();
-				animate2();
-			},
-			progress : function (current, total) {
-				console.log(current, total);
-			}
+		$.getJSON("/data/replays/817A479A475AF16E2D1E8E8138452FBA.replay.json", function(data) {
+			initializeAnimation(data);
+			$('.ui').show();
+			animate2();
 		});
 
 		window.addEventListener('resize', onWindowResize, false);
@@ -491,43 +446,5 @@ document.addEventListener("DOMContentLoaded", function (event) {
 	function render() {
 
 		renderer.render(scene, camera);
-	}
-
-	function ajaxProgress(o) {
-		$.ajax({
-			xhr : function () {
-				var xhr = new window.XMLHttpRequest();
-				xhr.upload.addEventListener("progress", function (evt) {
-					if (evt.lengthComputable) {
-						var percentComplete = evt.loaded / evt.total;
-						console.log(percentComplete);
-						$('.progress').css({
-							width : percentComplete * 100 + '%'
-						});
-						if (percentComplete === 1) {
-							$('.progress').addClass('hide');
-						}
-					}
-				}, false);
-				xhr.addEventListener("progress", function (evt) {
-					if (evt.lengthComputable) {
-						if (o.progress) {
-							o.progress(evt.loaded, evt.total);
-						}
-
-						//var percentComplete = evt.loaded / evt.total;
-						//console.log(percentComplete);
-						/*$('.progress').css({
-						width: percentComplete * 100 + '%'
-						});*/
-					}
-				}, false);
-				return xhr;
-			},
-			dataType : o.dataType || "json",
-			type : "GET",
-			url : o.url,
-			success : o.success
-		});
 	}
 });

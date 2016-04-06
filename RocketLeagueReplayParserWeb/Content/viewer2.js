@@ -213,6 +213,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			}
 			if ( this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"] ) {
 				console.log(time + ": New player added: " + this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"]);
+				generatePlayerUi();
 			}
 			
 			if ( this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:SecondsRemaining"] ) {
@@ -339,6 +340,23 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		if (interpAngle < -1 ) interpAngle += 2;
 		if (interpAngle > 1 ) interpAngle -= 2;
 		return interpAngle;
+	}
+	
+	function generatePlayerUi() {
+		// Man I should be using Angular or something instead of this nonsense.
+		var html = "Players";
+		for(var a in actors) {
+			if ( actors.hasOwnProperty(a) && actors[a].currentState.TypeName == "TAGame.Default__PRI_TA" ) {
+				var teamId = actors[a].currentState["Engine.PlayerReplicationInfo:Team"].ActorId;
+				var color = 'FF7700';
+				if (actors[teamId].currentState.TypeName == "Archetypes.Teams.Team1") {
+					color = '8888FF';
+				}
+				html += "<div style=\"color:#" + color + ";\">" + actors[a].currentState["Engine.PlayerReplicationInfo:PlayerName"] + "</div>";
+			}
+		}
+		document.getElementById("players").innerHTML = html;
+		
 	}
 		
 	function onWindowResize() {

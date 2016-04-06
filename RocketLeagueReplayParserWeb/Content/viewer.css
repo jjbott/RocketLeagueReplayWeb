@@ -17,3 +17,14 @@ body {
 	padding: 5px;
 
 }
+
+.center {
+	display:table
+}
+.center div {
+    height: 100%;
+    width:100%;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+}

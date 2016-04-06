@@ -11,9 +11,12 @@
 </head>
 
 <body>
-<div id="info">
-    <div>Ball X: <span id="ballX">0</span> Y: <span id="ballY">0</span> Z: <span id="ballZ">0</span></div>
-    <div>Car X: <span id="carX">0</span> Y: <span id="carY">0</span> Z: <span id="carZ">0</span></div>
+<div class="ui" style="display:none">
+<div style="display: inline-block; position: fixed; top: 0; left: 0; right: 0; width: 30%; height: 10%; margin: auto;">
+	<div class="center" style="width:30%;height:100%;float:left;"><div id="team0Score" style="background-color: #0000FF;color:#FFFFFF;font-size:2em;">0</div></div>
+	<div class="center" style="width:30%;height:100%;float:right;"><div id="team1Score" style="background-color: #FF7700;color:#FFFFFF;font-size:2em;">0</div></div>
+	<div class="center" style="width:40%;height:100%;"><div id="clock" style="background-color: #FFFFFF;color:#000000;font-size:2em;"></div></div>
+</div>
 </div>
 <div id="log"></div>
 <div id="container"></div>

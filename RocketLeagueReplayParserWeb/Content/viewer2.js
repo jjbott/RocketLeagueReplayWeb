@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", function (event) {
 
-	if (!Detector.webgl)
+	if (!Detector.webgl) {
 		Detector.addGetWebGLMessage();
+		return;
+	}
 
 	var clock = new THREE.Clock();
 
@@ -113,10 +115,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 		//
 		//$.getJSON("/data/replays/817A479A475AF16E2D1E8E8138452FBA.replay.json", function(data) {
+		// TODO: all json loaders need to be promisized. No guarantee this will finish last!
 		ajaxProgress({
 			url : "/data/replays/817A479A475AF16E2D1E8E8138452FBA.replay.json",
 			success : function (data) {
 				initializeAnimation(data);
+				$('.ui').show();
 				animate2();
 			},
 			progress : function (current, total) {
@@ -263,8 +267,25 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			if ( this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"] ) {
 				console.log(time + ": New player added: " + this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"]);
 			}
+			
 			if ( this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:SecondsRemaining"] ) {
-				console.log(time + ": Time remaining: " + this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:SecondsRemaining"]);
+				var s = parseInt(this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:SecondsRemaining"]);
+				var m = Math.floor(s / 60);
+				s %= 60;
+				s = ('00'+s).substring((''+s).length);
+				document.getElementById('clock').innerText = m + ":" + s;
+				//console.log(time + ": Time remaining: " + this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:SecondsRemaining"]);
+			}
+			
+			if ( this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:bOverTime"] ) {
+				document.getElementById('clock').innerText = "OVERTIME";
+			}
+			
+			 if ( this.unrenderedStateChanges["Engine.TeamInfo:Score"] ) {
+				var id = 'team0Score';
+				if ( this.currentState.TypeName == "Archetypes.Teams.Team1" ) id = "team1Score";
+				
+				document.getElementById(id).innerText = this.unrenderedStateChanges["Engine.TeamInfo:Score"];
 			}
 			
 			var rbState = this.currentState["TAGame.RBActor_TA:ReplicatedRBState"];
@@ -470,14 +491,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
 	function render() {
 
 		renderer.render(scene, camera);
-
-		document.getElementById('ballX').innerHTML = ballPosition[0].toString();
-		document.getElementById('ballY').innerHTML = ballPosition[1].toString();
-		document.getElementById('ballZ').innerHTML = ballPosition[2].toString();
-
-		document.getElementById('carX').innerHTML = carPosition[0].toString();
-		document.getElementById('carY').innerHTML = carPosition[1].toString();
-		document.getElementById('carZ').innerHTML = carPosition[2].toString();
 	}
 
 	function ajaxProgress(o) {

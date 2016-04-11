@@ -1,3 +1,21 @@
+var camera,
+controls,
+scene,
+renderer;
+
+var actors = {};
+	
+var calc2DPoint = function(worldVector, renderer, camera)
+{
+	var vector = worldVector.project(camera)
+	var halfWidth = renderer.domElement.width / 2;
+	var halfHeight = renderer.domElement.height / 2;
+	return {
+		x: Math.round(vector.x * halfWidth + halfWidth),
+		y: Math.round(-vector.y * halfHeight + halfHeight)
+	};
+}
+
 document.addEventListener("DOMContentLoaded", function (event) {
 
 	if (!Detector.webgl) {
@@ -6,11 +24,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
 	}
 
 	var clock = new THREE.Clock();
-
-	var camera,
-	controls,
-	scene,
-	renderer;
+	clock.autoStart = false;
+	$('#pausePlay').click(function(){
+		if ( clock.running ) {
+			$('#pausePlay').text("play");
+			clock.stop();
+		}
+		else { 
+			$('#pausePlay').text("pause");
+			clock.start();
+		}
+	});
+	
+	var carmesh;
 
 	var animData;
 	//var mesh;
@@ -39,19 +65,42 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		controls.enableDamping = true;
 		controls.dampingFactor = 0.25;
 		// world
-
-
-		var loader = new THREE.JSONLoader(); // init the loader util
-
+		
+		// old sketchy stadium
+		var loader = new THREE.JSONLoader();
 		loader.load('/Content/Stadiums/default.json', function (geometry) {
+		
 			var material = new THREE.MeshPhongMaterial({
-				color : 0xaaffaa,
-				shading : THREE.FlatShading
+				color: 0xaaffaa,
+				shading: THREE.FlatShading
 			});
-			var mesh = new THREE.Mesh(geometry, material);
+	  
+			
+			var mesh = new THREE.Mesh(
+				geometry,
+				material
+			);
+			
 			mesh.castShadow = false;
 			mesh.receiveShadow = true;
+		  
 			scene.add(mesh);
+			
+			// lights to fake team coloring
+			
+			light = new THREE.DirectionalLight(0x002288);
+			light.position.set(1, 1, -1);
+			scene.add(light);
+			
+			light = new THREE.DirectionalLight(0x882222);
+			light.position.set(-1, -1, -1);
+			scene.add(light);
+		});
+		objLoader.load('/Content/car6.json', function (obj) {
+		
+			carmesh = obj.children[0];
+			carmesh.castShadow = true;
+			carmesh.receiveShadow = true;
 		});
 		
 		// lights
@@ -65,14 +114,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		light.shadow.camera.bottom = -5000;
 		light.shadow.camera.near = 2000;
 		light.shadow.camera.far = 6000;
-		scene.add(light);
 
-		light = new THREE.DirectionalLight(0x002288);
-		light.position.set(1, 1, -1);
-		scene.add(light);
-
-		light = new THREE.DirectionalLight(0x882222);
-		light.position.set(-1, -1, -1);
+		
+		
 		scene.add(light);
 
 		light = new THREE.AmbientLight(0x222222);
@@ -99,6 +143,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			}
 		}
 		startTime = minTime;
+	
+		$( "#timeline" ).slider({
+		  min: startTime,
+		  max: replay.Frames[replay.Frames.length-1].Time,
+		  orientation: "horizontal"
+		});
 	}
 
 	var startTime = 0;
@@ -107,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 	function animate2() {
 		var time = clock.getElapsedTime();
-		
+		$( "#timeline" ).slider( "option", "value", time );
 		for(var a in actors) {
 			if ( actors.hasOwnProperty(a) ) {
 				actors[a].render(time + startTime, scene);
@@ -118,9 +168,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 		render();
 	}
-	
-	
-	var actors = {};
 	
 	function processFrame(f) {
 		if ( f.DeletedActorIds ) {
@@ -214,6 +261,22 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			if ( this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"] ) {
 				console.log(time + ": New player added: " + this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"]);
 				generatePlayerUi();
+				
+				var div = document.createElement("div");
+				div.id = 'player' + this.currentState.Id;
+				div.innerText = this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"];
+				div.style = 'top:-10000px;left:-10000px;';
+				div.className = 'nameTag';
+				
+				var teamId = this.currentState["Engine.PlayerReplicationInfo:Team"].ActorId
+				var team = actors[teamId];
+				if (team.currentState.TypeName == "Archetypes.Teams.Team0") {
+					div.style.color = '#8888FF';
+				}
+				else {
+					div.style.color = '#FF8844';
+				}
+				document.body.appendChild(div);
 			}
 			
 			if ( this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:SecondsRemaining"] ) {
@@ -221,12 +284,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
 				var m = Math.floor(s / 60);
 				s %= 60;
 				s = ('00'+s).substring((''+s).length);
-				document.getElementById('clock').innerText = m + ":" + s;
+				document.getElementById('clockDisplay').innerText = m + ":" + s;
 				//console.log(time + ": Time remaining: " + this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:SecondsRemaining"]);
 			}
 			
 			if ( this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:bOverTime"] ) {
-				document.getElementById('clock').innerText = "OVERTIME";
+				document.getElementById('clockDisplay').innerText = "OVERTIME";
 			}
 			
 			 if ( this.unrenderedStateChanges["Engine.TeamInfo:Score"] ) {
@@ -240,6 +303,24 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			
 			if ( this.currentState.ClassName == "TAGame.Car_TA" && rbState) {
 				if ( !this.mesh ) {
+					this.mesh = carmesh.clone();
+					var paintSettings = this.currentState["TAGame.Car_TA:TeamPaint"];
+					
+					var accentMaterial = new THREE.MeshPhongMaterial({
+						color : colors.accent[paintSettings.CustomColorId],
+						shading : THREE.FlatShading
+					});
+					
+					this.mesh.children[1].material = accentMaterial;
+					
+					var teamMaterial = new THREE.MeshPhongMaterial({
+						color : paintSettings.TeamNumber == 0 ? colors.blueTeam[paintSettings.TeamColorId] : colors.orangeTeam[paintSettings.TeamColorId],
+						shading : THREE.FlatShading
+					});
+					
+					this.mesh.children[0].material = teamMaterial;
+					
+					/*
 					var playerId = this.currentState["Engine.Pawn:PlayerReplicationInfo"].ActorId;
 					var teamId = actors[playerId].currentState["Engine.PlayerReplicationInfo:Team"].ActorId;
 					var team = actors[teamId];
@@ -259,7 +340,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
 					this.mesh = new THREE.Mesh(geometry, material);
 					this.mesh.matrixAutoUpdate = true;
 					this.mesh.castShadow = true;
-					this.mesh.receiveShadow = true;
+					this.mesh.receiveShadow = true;*/
+					this.mesh.receiveShadow = false;
 					scene.add(this.mesh);
 				}
 			}
@@ -324,6 +406,20 @@ document.addEventListener("DOMContentLoaded", function (event) {
 					this.mesh.position.set(rbState.Position.X, rbState.Position.Y, rbState.Position.Z);
 					this.mesh.rotation.set(rbState.Rotation.Z * Math.PI * -1, rbState.Rotation.X * Math.PI /** -1*/, rbState.Rotation.Y * Math.PI /** -1*/, 'ZYX');
 				}
+				
+				if ( this.currentState["Engine.Pawn:PlayerReplicationInfo"] ) {
+					var actorId = this.currentState["Engine.Pawn:PlayerReplicationInfo"].ActorId;
+					var div = document.getElementById("player" + actorId);
+					if ( div ) {
+						var pos = this.mesh.position.clone();
+						pos.z += 200;
+						var pos = calc2DPoint(pos, renderer, camera);
+						div.style.top = pos.y-20;
+						div.style.left = pos.x;
+					}
+				}
+				
+				
 			}
 			
 			this.unrenderedStateChanges = {};
@@ -349,7 +445,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			if ( actors.hasOwnProperty(a) && actors[a].currentState.TypeName == "TAGame.Default__PRI_TA" ) {
 				var teamId = actors[a].currentState["Engine.PlayerReplicationInfo:Team"].ActorId;
 				var color = 'FF7700';
-				if (actors[teamId].currentState.TypeName == "Archetypes.Teams.Team1") {
+				if (actors[teamId] && actors[teamId].currentState && actors[teamId].currentState.TypeName == "Archetypes.Teams.Team1") {
 					color = '8888FF';
 				}
 				html += "<div style=\"color:#" + color + ";\">" + actors[a].currentState["Engine.PlayerReplicationInfo:PlayerName"] + "</div>";

@@ -5,22 +5,38 @@
 <script type="text/javascript" src="http://threejs.org/examples/js/Detector.js"></script>
 <script type="text/javascript" src="http://threejs.org/build/three.min.js"></script>
 <script type="text/javascript" src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script type="text/javascript" src="/Content/jquery/jquery-ui.js"></script>
+<script type="text/javascript" src="/Content/colors.js"></script>
 <script type="text/javascript" src="/Content/viewer2.js"></script>
 
 <link rel="stylesheet" type="text/css" href="/Content/viewer.css">
+<link rel="stylesheet" type="text/css" href="/Content/jquery/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="/Content/jquery/jquery-ui.theme.css">
 </head>
 
 <body>
 
 <div class="ui" style="display:none">
 	<div style="display: flex; position: fixed; top: 0; left: 0; right: 0; width: 30%; height: 4em; margin: auto;">
-
 		<div class="center" style="order:1;width:30%;height:100%;"><div id="team0Score" style="background-color: #0000FF;color:#FFFFFF;font-size:2em;">0</div></div>
 		<div class="center" style="order:3;width:30%;height:100%;"><div id="team1Score" style="background-color: #FF7700;color:#FFFFFF;font-size:2em;">0</div></div>
-		<div class="center" style="order:2;width:40%;height:100%;"><div id="clock" style="background-color: #FFFFFF;color:#000000;font-size:2em;"></div></div>
+		<div class="center" style="order:2;width:40%;height:100%;"><div id="clockDisplay" style="background-color: #FFFFFF;color:#000000;font-size:2em;"></div></div>
 	</div>
 	
 	<div id="players" style="position: fixed; top: 5%; left: 1%; margin: auto;color:#FFFFFF;background-color:rgba(0, 0, 0, 0.5);">Players</div>
+	
+	<div style="display: flex; position: fixed; bottom: 0; left: 0; right: 0; width: 80%; height: 6em; margin: auto;padding:1em;">
+		<div class="center" style="order:1;width:10%;height:100%;margin:.5em;">
+			<div id="pausePlay" style="background-color: #FFFFFF;opacity:0.5;font-size:2em;border-radius:.5em;cursor:pointer;">
+			play
+			</div>
+		</div>
+		<div class="center" style="order:2;width:90%;height:100%;margin:.5em;">
+			<div style="background-color: #FFFFFF;opacity:0.5;font-size:2em;border-radius:.5em;height:100%;">
+				<div id="timeline" style="height:1em;margin:1em;width:100%;"></div>
+			</div>
+		</div>
+	</div>
 	
 </div>
 <div id="container"></div>

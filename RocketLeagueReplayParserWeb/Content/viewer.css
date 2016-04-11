@@ -28,3 +28,12 @@ body {
     display: table-cell;
     vertical-align: middle;
 }
+
+.nameTag {
+	position:absolute;
+	transform: translate(-50%,0);
+	opacity:0.5;
+	border-radius:1em;
+	background-color: #FFFFFF;
+	padding:.1em .5em .1em .5em;
+}

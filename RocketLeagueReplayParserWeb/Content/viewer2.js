@@ -4,6 +4,9 @@ scene,
 renderer;
 
 var actors = {};
+
+var clock = new THREE.Clock();
+clock.autoStart = false;
 	
 var calc2DPoint = function(worldVector, renderer, camera)
 {
@@ -23,8 +26,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		return;
 	}
 
-	var clock = new THREE.Clock();
-	clock.autoStart = false;
+	
 	$('#pausePlay').click(function(){
 		if ( clock.running ) {
 			$('#pausePlay').text("play");
@@ -39,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 	var carmesh;
 
 	var animData;
+	var startTime = 0;
 	//var mesh;
 	init();
 
@@ -96,6 +99,8 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			light.position.set(-1, -1, -1);
 			scene.add(light);
 		});
+		
+		var objLoader = new THREE.ObjectLoader();
 		objLoader.load('/Content/car6.json', function (obj) {
 		
 			carmesh = obj.children[0];
@@ -136,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
 	function initializeAnimation(replay) {
 		var id = replay.Properties.Id;
 		var minTime = replay.Frames[0].Time;
-		// var maxTime = replay.Frames[replay.Frames.length-1].Time; // Wont work until I get rid of null frames
+		var maxTime = replay.Frames[replay.Frames.length-1].Time;
 		for(var i = 0; i < replay.Frames.length; ++i) {
 			if ( replay.Frames[i] ) { // TODO: get rid of null frames!
 				processFrame(replay.Frames[i]);
@@ -144,20 +149,46 @@ document.addEventListener("DOMContentLoaded", function (event) {
 		}
 		startTime = minTime;
 	
+		
 		$( "#timeline" ).slider({
-		  min: startTime,
-		  max: replay.Frames[replay.Frames.length-1].Time,
-		  orientation: "horizontal"
+			min: minTime,
+			max: maxTime,
+			orientation: "horizontal",
+			start: function( event, ui ) {
+				this.resumeOnStop = clock.running;
+				clock.stop();
+			},
+			stop: function( event, ui ) {
+				clock.elapsedTime = ui.value - startTime;
+				if ( this.resumeOnStop ) {
+					clock.start();
+				}
+			}
 		});
+		
+		for(var i = 0; i < replay.TickMarks.length; ++i) {
+			var div = document.createElement("div");
+			div.className = "tick";
+			div.innerText = "G";
+			div.style = 'left:' + 100 * (replay.TickMarks[i].Time-minTime)/(maxTime-minTime) + '%';
+			if ( replay.TickMarks[i].Type == 'Team0Goal' ) {
+				div.style.color = '#8888FF';
+			}
+			else {
+				div.style.color = '#FF8844';
+			}
+			$('#timeline').prepend(div);
+		}
 	}
 
-	var startTime = 0;
 	//var replay;
 	//var nextFrameIndex = 0;
 
 	function animate2() {
 		var time = clock.getElapsedTime();
-		$( "#timeline" ).slider( "option", "value", time );
+		if ( clock.running ) {
+			$( "#timeline" ).slider( "option", "value", time  + startTime );
+		}
 		for(var a in actors) {
 			if ( actors.hasOwnProperty(a) ) {
 				actors[a].render(time + startTime, scene);
@@ -207,8 +238,19 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			if ( this.currentFrameIndex >= 0 && time < this.frames[this.currentFrameIndex].time ) {
 				// Time went backwards (or current time is less than the 1st frame's time)! Reset currentFrameIndex so we start over
 				// We cant just traverse the states backwards, because they're built up from previous states
+				if ( this.currentState.TypeName == "TAGame.Default__PRI_TA" ) {
+					$('#player' + this.currentState.Id).remove();
+					generatePlayerUi();
+				}
+				
+				if ( this.mesh ) { 
+					scene.remove(this.mesh);
+					this.mesh = null;
+				}
+				
 				this.currentFrameIndex = -1;
 				this.currentState = {};
+				
 			}
 			
 			// Advance to the correct frame, updating the current state along the way. 
@@ -216,6 +258,11 @@ document.addEventListener("DOMContentLoaded", function (event) {
 				this.currentFrameIndex++;
 				var frame = this.frames[this.currentFrameIndex];
 				if ( !frame.state ) {
+					if ( this.currentState.TypeName == "TAGame.Default__PRI_TA" ) {
+						$('#player' + this.currentState.Id).remove();
+						generatePlayerUi();
+					}
+					
 					this.currentState = {};
 					// If we've blown through multiple frames in this render, we may have unrendered changes
 					// Oh well. This might become a problem though. Keep an eye on it.
@@ -256,8 +303,33 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			}
 			
 			if ( this.unrenderedStateChanges.TypeName ) {
-				console.log(time + ": New actor created: " + this.unrenderedStateChanges.TypeName);
+				//console.log(time + ": New actor created: " + this.unrenderedStateChanges.TypeName);
 			}
+			
+			if ( this.unrenderedStateChanges["TAGame.GameEvent_TA:ReplicatedGameStateTimeRemaining"] ) {
+				// Storing the time to be used later when rendering the countdown
+				this.currentState["TAGame.GameEvent_TA:ReplicatedGameStateTimestamp"] = this.frames[this.currentFrameIndex].time;
+			}
+			
+			if ( this.unrenderedStateChanges["TAGame.GameEvent_TA:ReplicatedGameStateTimeRemaining"] === 0 ) {
+				$("#countdown").text("GO").stop().fadeTo(0,1).fadeOut(1000);
+			}
+			else if ( parseInt(this.currentState["TAGame.GameEvent_TA:ReplicatedGameStateTimeRemaining"]) > 0 ) {
+				var countdownStart = this.currentState["TAGame.GameEvent_TA:ReplicatedGameStateTimestamp"];
+				var countdownValue = Math.ceil(parseInt(this.currentState["TAGame.GameEvent_TA:ReplicatedGameStateTimeRemaining"]) - (time - countdownStart));
+				
+				if ( countdownValue > 0 ) { // Wait for start event before we display 0 (or 'GO'), lag might delay it
+					var currentCountdownValue = $("#countdown").text();
+					if ( currentCountdownValue != countdownValue ) {
+						$("#countdown").text(countdownValue).stop().fadeTo(0,1).fadeOut(1000);
+					}
+				}
+			}
+			
+			if ( this.unrenderedStateChanges["TAGame.GameEvent_TA:ReplicatedStateIndex"] ) {
+				console.log(time + ": Changed Game State: " + this.unrenderedStateChanges["TAGame.GameEvent_TA:ReplicatedStateIndex"]);
+			}
+			
 			if ( this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"] ) {
 				console.log(time + ": New player added: " + this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"]);
 				generatePlayerUi();

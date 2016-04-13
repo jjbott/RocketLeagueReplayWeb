@@ -9,9 +9,10 @@
 <script type="text/javascript" src="/Content/colors.js"></script>
 <script type="text/javascript" src="/Content/viewer2.js"></script>
 
-<link rel="stylesheet" type="text/css" href="/Content/viewer.css">
+
 <link rel="stylesheet" type="text/css" href="/Content/jquery/jquery-ui.css">
 <link rel="stylesheet" type="text/css" href="/Content/jquery/jquery-ui.theme.css">
+<link rel="stylesheet" type="text/css" href="/Content/viewer.css">
 </head>
 
 <body>
@@ -25,18 +26,20 @@
 	
 	<div id="players" style="position: fixed; top: 5%; left: 1%; margin: auto;color:#FFFFFF;background-color:rgba(0, 0, 0, 0.5);">Players</div>
 	
-	<div style="display: flex; position: fixed; bottom: 0; left: 0; right: 0; width: 80%; height: 6em; margin: auto;padding:1em;">
-		<div class="center" style="order:1;width:10%;height:100%;margin:.5em;">
-			<div id="pausePlay" style="background-color: #FFFFFF;opacity:0.5;font-size:2em;border-radius:.5em;cursor:pointer;">
+	<div id="controls" style="display: flex; position: fixed; bottom: 0; left: 0; right: 0; width: 80%; height: 6em; margin: auto;padding:1em;">
+		<div class="center2" id="pausePlay" style="order:1;width:10%;height:100%;margin:.5em;background-color: #FFFFFF;font-size:2em;border-radius:.5em;cursor:pointer;">
 			play
-			</div>
+			<span class="play"></span>
 		</div>
-		<div class="center" style="order:2;width:90%;height:100%;margin:.5em;">
-			<div style="background-color: #FFFFFF;opacity:0.5;font-size:2em;border-radius:.5em;height:100%;">
-				<div id="timeline" style="height:1em;margin:1em;width:100%;"></div>
-			</div>
+		<div class="center2" style="order:2;width:90%;height:100%;margin:.5em;background-color: #FFFFFF;font-size:2em;border-radius:.5em;height:100%;">
+			
+				<div id="timeline" style="margin:1em;">
+				</div>
+				
 		</div>
 	</div>
+	
+	<div id="countdown"></div>
 	
 </div>
 <div id="container"></div>

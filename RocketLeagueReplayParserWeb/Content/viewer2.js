@@ -312,7 +312,10 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			}
 			
 			if ( this.unrenderedStateChanges["TAGame.GameEvent_TA:ReplicatedGameStateTimeRemaining"] === 0 ) {
-				$("#countdown").text("GO").stop().fadeTo(0,1).fadeOut(1000);
+				var countdownStart = this.currentState["TAGame.GameEvent_TA:ReplicatedGameStateTimestamp"];
+				if ( $("#countdown").text() != "GO" && (time - countdownStart) < 5 ) { // make sure we dont display "GO" after the user drags the slider around (make check if this change is in the current frame instead?)
+					$("#countdown").text("GO").stop().fadeTo(0,1).fadeOut(1000); // Possibly tie fade out to clock time instead of relying on jquery?
+				}
 			}
 			else if ( parseInt(this.currentState["TAGame.GameEvent_TA:ReplicatedGameStateTimeRemaining"]) > 0 ) {
 				var countdownStart = this.currentState["TAGame.GameEvent_TA:ReplicatedGameStateTimestamp"];

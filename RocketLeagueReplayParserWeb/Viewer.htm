@@ -1,18 +1,46 @@
 <head>
-
+<link rel="stylesheet" type="text/css" href="/Content/pace.css">
+<script type="text/javascript" src="/Content/pace.min.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 <script type="text/javascript" src="http://threejs.org/examples/js/Detector.js"></script>
 <script type="text/javascript" src="http://threejs.org/build/three.min.js"></script>
 <script type="text/javascript" src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script type="text/javascript" src="/Content/jquery/jquery-ui.js"></script>
+<script type="text/javascript" src="/Content/colors.js"></script>
 <script type="text/javascript" src="/Content/viewer.js"></script>
 
+
+<link rel="stylesheet" type="text/css" href="/Content/jquery/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="/Content/jquery/jquery-ui.theme.css">
 <link rel="stylesheet" type="text/css" href="/Content/viewer.css">
 </head>
 
 <body>
-<div id="info">
-    <div>Ball X: <span id="ballX">0</span> Y: <span id="ballY">0</span> Z: <span id="ballZ">0</span></div>
-    <div>Car X: <span id="carX">0</span> Y: <span id="carY">0</span> Z: <span id="carZ">0</span></div>
+
+<div class="ui" style="display:none">
+	<div style="display: flex; position: fixed; top: 0; left: 0; right: 0; width: 30%; height: 4em; margin: auto;">
+		<div class="center" style="order:1;width:30%;height:100%;"><div id="team0Score" style="background-color: #0000FF;color:#FFFFFF;font-size:2em;">0</div></div>
+		<div class="center" style="order:3;width:30%;height:100%;"><div id="team1Score" style="background-color: #FF7700;color:#FFFFFF;font-size:2em;">0</div></div>
+		<div class="center" style="order:2;width:40%;height:100%;"><div id="clockDisplay" style="background-color: #FFFFFF;color:#000000;font-size:2em;"></div></div>
+	</div>
+	
+	<div id="players" style="position: fixed; top: 5%; left: 1%; margin: auto;color:#FFFFFF;background-color:rgba(0, 0, 0, 0.5);">Players</div>
+	
+	<div id="controls" style="display: flex; position: fixed; bottom: 0; left: 0; right: 0; width: 80%; height: 6em; margin: auto;padding:1em;">
+		<div class="center2" id="pausePlay" style="order:1;width:10%;height:100%;margin:.5em;background-color: #FFFFFF;font-size:2em;border-radius:.5em;cursor:pointer;">
+			play
+			<span class="play"></span>
+		</div>
+		<div class="center2" style="order:2;width:90%;height:100%;margin:.5em;background-color: #FFFFFF;font-size:2em;border-radius:.5em;height:100%;">
+			
+				<div id="timeline" style="margin:1em;">
+				</div>
+				
+		</div>
+	</div>
+	
+	<div id="countdown"></div>
+	
 </div>
 <div id="container"></div>
 </body>

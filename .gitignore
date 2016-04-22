@@ -6,3 +6,7 @@ packages
 replays/
 *.user
 .vs
+node_modules/
+typings/
+*.map
+*/angular/app/*.js

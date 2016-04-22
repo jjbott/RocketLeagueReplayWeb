@@ -9,6 +9,30 @@
 <script type="text/javascript" src="/Content/colors.js"></script>
 <script type="text/javascript" src="/Content/viewer2.js"></script>
 
+<script src="angular/node_modules/es6-shim/es6-shim.min.js"></script>
+<script src="angular/node_modules/systemjs/dist/system-polyfills.js"></script>
+<script src="angular/node_modules/angular2/es6/dev/src/testing/shims_for_IE.js"></script>   
+
+<script src="angular/node_modules/angular2/bundles/angular2-polyfills.js"></script>
+<script src="angular/node_modules/systemjs/dist/system.src.js"></script>
+<script src="angular/node_modules/rxjs/bundles/Rx.js"></script>
+<script src="angular/node_modules/angular2/bundles/angular2.dev.js"></script>
+
+<!-- 2. Configure SystemJS -->
+<script>
+  System.config({
+	packages: {        
+	  "angular/app": {
+		format: 'register',
+		defaultExtension: 'js'
+	  }
+	}
+  });
+  System.import('angular/app/main')
+		.then(null, console.error.bind(console));
+</script>
+
+
 
 <link rel="stylesheet" type="text/css" href="/Content/jquery/jquery-ui.css">
 <link rel="stylesheet" type="text/css" href="/Content/jquery/jquery-ui.theme.css">
@@ -43,4 +67,6 @@
 	
 </div>
 <div id="container"></div>
+<my-app>
+</my-app>
 </body>

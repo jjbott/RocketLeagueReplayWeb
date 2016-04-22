@@ -75,14 +75,6 @@ body {
 	opacity:.8 !important;
 }
 
-#controls .play {
-	width: 0;
-	height: 0;
-	border-style: solid;
-	border-width: 50% 0 50% 100%;
-	border-color: transparent transparent transparent #8888FF;
-}
-
 .tick {
 	position:absolute;
 	top:-1em;

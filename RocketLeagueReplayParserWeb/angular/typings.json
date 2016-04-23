@@ -1,6 +1,10 @@
 {
   "ambientDependencies": {
     "es6-shim": "github:DefinitelyTyped/DefinitelyTyped/es6-shim/es6-shim.d.ts#7de6c3dd94feaeb21f20054b9f30d5dabc5efabd",
-    "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#7de6c3dd94feaeb21f20054b9f30d5dabc5efabd"
-  }
+    "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts#7de6c3dd94feaeb21f20054b9f30d5dabc5efabd",
+    "jquery": "registry:dt/jquery#1.10.0+20160316155526",
+    "three": "registry:dt/three#0.0.0+20160417141754",
+    "three-orbitcontrols": "registry:dt/three-orbitcontrols#0.0.0+20160317120654"
+  },
+  "dependencies": {}
 }

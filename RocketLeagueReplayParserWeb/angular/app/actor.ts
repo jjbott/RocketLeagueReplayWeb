@@ -1,5 +1,5 @@
-import Scene = THREE.Scene;
-import Mesh = THREE.Mesh;
+//import Scene = THREE.Scene;
+//import Mesh = THREE.Mesh;
 
 class Actor { 
 	private currentFrameIndex: number = -1;
@@ -8,7 +8,9 @@ class Actor {
 	private unrenderedStateChanges: any = {};
 	private nextRbStateFrameIndex: number = null;
 	private mesh: Mesh = null;
-	constructor(private actors:any, private colors:any, private carMesh:Mesh, private materials:any) {
+	private colors: any;
+	constructor(private actors:any, private carMesh: Mesh) {
+		this.colors = (<any>window).colors; // Todo: make less bad. use less 'any'
 	}
 
 	addUpdate(time, state) {
@@ -84,7 +86,27 @@ class Actor {
 		}
 		
 		if ( this.unrenderedStateChanges.TypeName ) {
+			if (this.currentState.TypeName == "TAGame.Default__PRI_TA") {
+				// Add a ref to the team actor, to make the UI a bit easier.
+				var teamId = this.currentState["Engine.PlayerReplicationInfo:Team"].ActorId;
+				this.currentState.Team = this.actors[teamId];
+			}
 			//console.log(time + ": New actor created: " + this.unrenderedStateChanges.TypeName);
+		}
+
+		if ( this.unrenderedStateChanges.ClassName ) {
+			if (this.currentState.ClassName == "TAGame.Car_TA") {
+				// Add refs between the car and player to make the UI easier
+				// So far only used for showing replicated steering and similar in the player list, so may not be necessary once that's removed.
+				var playerActorId = this.currentState["Engine.Pawn:PlayerReplicationInfo"].ActorId;
+				this.currentState.Player = this.actors[playerActorId];
+				this.actors[playerActorId].currentState.Vehicle = this;
+			}
+		}
+
+		if (this.unrenderedStateChanges["TAGame.CarComponent_TA:Vehicle"]) {
+			var vehicleActorId = this.currentState["TAGame.CarComponent_TA:Vehicle"][1]; // TODO: Fix when JSON is fixed to name this "ActorId"
+			this.actors[vehicleActorId].currentState.Boost = this;
 		}
 		
 		if ( this.unrenderedStateChanges["TAGame.GameEvent_TA:ReplicatedGameStateTimeRemaining"] ) {

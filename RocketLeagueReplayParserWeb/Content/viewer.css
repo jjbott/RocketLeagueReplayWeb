@@ -66,6 +66,14 @@ body {
 	font-size:9em;
 }
 
+.ui .team0 {
+	color: #FF7700;
+}
+
+.ui .team1 {
+	color: #8888FF;
+}					
+					
 #controls>div{
 	opacity:0.5;
 	transition: opacity .5s;

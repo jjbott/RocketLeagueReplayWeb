@@ -70,14 +70,17 @@ export class NameTags {
     <td>{{player.currentState["TAGame.PRI_TA:MatchSaves"] || 0}}</td>
     <td>{{player.currentState["TAGame.PRI_TA:MatchShots"] || 0}}</td>
     <td>{{player.currentState["TAGame.PRI_TA:MatchGoals"] || 0}}</td>
-    <td>{{player.currentState.Vehicle.currentState["TAGame.Vehicle_TA:ReplicatedSteer"] || 0}}</td>
-    <td>{{player.currentState.Vehicle.currentState["TAGame.Vehicle_TA:ReplicatedThrottle"] || 0}}</td>
+    <td><img class="playerSteering" src="/Content/wheel32.png" style='transform:rotate({{(steeringValue()-128)*.5}}deg)' alt='{{steeringValue()}}'></td>
+    <td>{{(player.currentState.Vehicle && player.currentState.Vehicle.currentState["TAGame.Vehicle_TA:ReplicatedThrottle"]) || 0}}</td>
     <td>{{(player.currentState.Vehicle && player.currentState.Vehicle.currentState.Boost && player.currentState.Vehicle.currentState.Boost.currentState["TAGame.CarComponent_TA:Active"]) ? "ON" : ""}}</td>
     `
 })
 export class PlayerListRow {
 	@Input() player: Actor;
 
+	steeringValue() {
+		return (this.player.currentState.Vehicle && this.player.currentState.Vehicle.currentState["TAGame.Vehicle_TA:ReplicatedSteer"]) || 128;
+	}
 }
 
 @Component({

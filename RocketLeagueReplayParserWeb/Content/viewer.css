@@ -81,7 +81,11 @@ body {
 .ui .team1 {
 	color: #8888FF;
 }					
-					
+
+.ui .playerSteering {
+	width:1.5em;
+}
+
 #controls>div{
 	opacity:0.5;
 	transition: opacity .5s;

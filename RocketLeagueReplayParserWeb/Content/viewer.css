@@ -39,6 +39,14 @@ body {
 	pointer-events:none;
 }
 
+.nameTag.team0 {
+	color:#8888FF;
+}
+
+.nameTag.team1 {
+	color:#FF8844;
+}
+
 #timeline.ui-slider {
 	background-color:#8888FF;
 	background-image: none;

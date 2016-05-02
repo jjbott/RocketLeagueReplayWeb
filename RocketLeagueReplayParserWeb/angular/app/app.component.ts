@@ -5,6 +5,9 @@ import {Http, HTTP_PROVIDERS} from 'angular2/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 
+import WebGLRenderer = THREE.WebGLRenderer;
+import PerspectiveCamera = THREE.PerspectiveCamera;
+
 @Pipe({
     name: 'playerFilter',
     pure: false
@@ -13,6 +16,49 @@ export class PlayerFilter implements PipeTransform {
     transform(items: any[], args: any[]): any {
         return items.filter(item => item.currentState.TypeName == "TAGame.Default__PRI_TA");
     }
+}
+
+@Component({
+	selector: 'name-tags',
+	pipes: [PlayerFilter],
+	template: `<div  *ngFor="#a of actors | playerFilter" class="nameTag {{a.currentState.Team.currentState.TypeName == 'Archetypes.Teams.Team0' ? 'team0' : 'team1'}}" [style]="getStyle(a)">{{a.currentState["Engine.PlayerReplicationInfo:PlayerName"]}}</div>`
+})
+export class NameTags {
+	@Input() camera: PerspectiveCamera;
+	@Input() renderer: WebGLRenderer;
+	@Input() actors: Actor[];
+
+	getStyle(a : Actor) {
+		var vehicle = a.currentState.Vehicle;
+		if ( vehicle && vehicle.mesh && vehicle.mesh.position ) {
+			var pos = vehicle.mesh.position.clone();
+			pos.z += 200;
+			var screenPos = this.calc2DPoint(pos);
+			// Setting the style this way instead of binding to [style.left] and [style.top] because Angular2 refused to call the method twice (once for each property)
+			
+			if (screenPos) {
+				return `left:${screenPos.x}px;top:${screenPos.y - 20}px`;
+			}
+			else {
+				return 'opacity:0';	
+			}
+		}
+	}
+
+	private calc2DPoint(worldVector) {
+		var vector = worldVector.project(this.camera)
+		var halfWidth = this.renderer.domElement.width / 2;
+		var halfHeight = this.renderer.domElement.height / 2;
+		if (vector.z < 1) { // Filtering nametages that are behind the camera. Camera seems to use z=1 as the screen plane
+			return {
+				x: Math.round(vector.x * halfWidth + halfWidth),
+				y: Math.round(-vector.y * halfHeight + halfHeight)
+			};
+		}
+
+		return null;
+	}
+
 }
 
 @Component({
@@ -61,7 +107,7 @@ export class PlayerList {
 
 @Component({
     selector: 'my-app',
-    directives: [PlayerList],
+    directives: [PlayerList, NameTags],
     template: `<div class="ui" style="display:none">
 	<div style="display: flex; position: fixed; top: 0; left: 0; right: 0; width: 30%; height: 4em; margin: auto;">
 		<div class="center" style="order:1;width:30%;height:100%;"><div id="team0Score" style="background-color: #0000FF;color:#FFFFFF;font-size:2em;">0</div></div>
@@ -88,9 +134,8 @@ export class PlayerList {
 	
 </div>
 <div id="container"></div>
-<ul>
-	<li *ngFor="#a of actors">{{a.currentState["Engine.PlayerReplicationInfo:PlayerName"]}}</li>
-	</ul>`,
+<name-tags [actors]="actors" [renderer]="renderService.renderer" [camera]="renderService.camera"></name-tags>
+`,
 	providers: [RenderService]
 })
 export class AppComponent { 

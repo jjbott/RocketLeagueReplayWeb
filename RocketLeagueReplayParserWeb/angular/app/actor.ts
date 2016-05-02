@@ -4,7 +4,7 @@
 class Actor { 
 	private currentFrameIndex: number = -1;
 	private frames: any = []; // todo: make Frame class
-	private currentState: any = {}; // class needed?
+	public currentState: any = {}; // class needed?
 	private unrenderedStateChanges: any = {};
 	private nextRbStateFrameIndex: number = null;
 	private mesh: Mesh = null;
@@ -138,24 +138,6 @@ class Actor {
 		
 		if ( this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"] ) {
 			console.log(time + ": New player added: " + this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"]);
-//////generatePlayerUi();
-			
-			var div = document.createElement("div");
-			div.id = 'player' + this.currentState.Id;
-			div.innerText = this.unrenderedStateChanges["Engine.PlayerReplicationInfo:PlayerName"];
-			div.style.top = '-10000px';
-			div.style.left = '-10000px;';
-			div.className = 'nameTag';
-			
-			var teamId = this.currentState["Engine.PlayerReplicationInfo:Team"].ActorId
-			var team = this.actors[teamId];
-			if (team.currentState.TypeName == "Archetypes.Teams.Team0") {
-				div.style.color = '#8888FF';
-			}
-			else {
-				div.style.color = '#FF8844';
-			}
-			document.body.appendChild(div);
 		}
 		
 		if ( this.unrenderedStateChanges["TAGame.GameEvent_Soccar_TA:SecondsRemaining"] ) {
@@ -275,50 +257,32 @@ class Actor {
 				(rbState.Position.Y + rbState.LinearVelocity.Y * d * 0.111399), 
 				(rbState.Position.Z + rbState.LinearVelocity.Z * d * 0.111399));
 				*/
-			if ( this.nextRbStateFrameIndex && !rbState.Sleeping ) {
+			if (this.nextRbStateFrameIndex && !rbState.Sleeping) {
 				var thisFrame = this.frames[this.currentFrameIndex];
 				var nextFrame = this.frames[this.nextRbStateFrameIndex];
 				var rbDelta = nextFrame.time - thisFrame.time;
 				var tDelta = time - thisFrame.time;
-				var percent = tDelta/rbDelta;
+				var percent = tDelta / rbDelta;
 				var nextRbState = nextFrame.state["TAGame.RBActor_TA:ReplicatedRBState"];
 				var x = rbState.Position.X + (nextRbState.Position.X - rbState.Position.X) * percent;
 				var y = rbState.Position.Y + (nextRbState.Position.Y - rbState.Position.Y) * percent;
 				var z = rbState.Position.Z + (nextRbState.Position.Z - rbState.Position.Z) * percent;
-				this.mesh.position.set(x,y,z);
-				
+				this.mesh.position.set(x, y, z);
+
 				// Linear rotation interpolation for now. Maybe slerp someday.
-				
+
 				x = interpolateAngle(rbState.Rotation.X, nextRbState.Rotation.X, percent);
 				y = interpolateAngle(rbState.Rotation.Y, nextRbState.Rotation.Y, percent);
 				z = interpolateAngle(rbState.Rotation.Z, nextRbState.Rotation.Z, percent);
-				
+
 				// Not sure why this is slightly different than the old version
 				this.mesh.rotation.set(z * Math.PI * -1, x * Math.PI /** -1*/, y * Math.PI /** -1*/, 'ZYX');
-				
+
 			}
 			else {
 				this.mesh.position.set(rbState.Position.X, rbState.Position.Y, rbState.Position.Z);
 				this.mesh.rotation.set(rbState.Rotation.Z * Math.PI * -1, rbState.Rotation.X * Math.PI /** -1*/, rbState.Rotation.Y * Math.PI /** -1*/, 'ZYX');
-			}
-			
-
-			// Move this to angular magic
-			/*
-			if ( this.currentState["Engine.Pawn:PlayerReplicationInfo"] ) {
-				var actorId = this.currentState["Engine.Pawn:PlayerReplicationInfo"].ActorId;
-				var div = document.getElementById("player" + actorId);
-				if ( div ) {
-					var pos = this.mesh.position.clone();
-					pos.z += 200;
-					var pos = calc2DPoint(pos, renderer, camera);
-					div.style.top = pos.y-20;
-					div.style.left = pos.x;
-				}
-			}
-			*/
-			
-			
+			}			
 		}
 		
 		this.unrenderedStateChanges = {};

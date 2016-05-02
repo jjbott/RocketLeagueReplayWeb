@@ -8,9 +8,10 @@ import Mesh = THREE.Mesh;
 import Clock = THREE.Clock;
 
 class RenderService {
+    public camera: PerspectiveCamera;
+    public renderer: WebGLRenderer;
+
     private scene: Scene;
-    private camera: PerspectiveCamera;
-    private renderer: WebGLRenderer;
     private controls: TrackballControls;
     private clock: Clock;
     private startTime: number;
@@ -105,7 +106,6 @@ class RenderService {
         // TODO: This is not very angulary
         var jqueryClock = this.clock;
         $('#pausePlay').click(function() {
-            debugger;
             if (jqueryClock.running) {
                 $('#pausePlay').text("play");
                 jqueryClock.stop();
